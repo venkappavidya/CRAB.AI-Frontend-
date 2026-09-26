@@ -110,13 +110,6 @@ export default function Home() {
                                     >
                                         Get Started
                                     </motion.button>
-                                    <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="secondary-button"
-                                    >
-                                        Watch Demo
-                                    </motion.button>
                                 </motion.div>
                             </motion.div>
                         </div>

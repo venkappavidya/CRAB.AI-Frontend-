@@ -22,23 +22,42 @@ const formatSummaryLabel = (key, value) => {
 };
 
 // A summary field is usually a string, but "author" is an array of names.
-// React concatenates array children with no separator, which renders
-// ["Ada Lovelace","Alan Turing"] as "Ada LovelaceAlan Turing".
+// React concatenates array children with no separator, so ["Lior Biton",
+// "Oren Tsur"] renders as "Lior BitonOren Tsur". Each entry is drawn as its
+// own chip. Spacing is inline rather than utility classes so it holds even if
+// the stylesheet loads late or a class is missing.
 const renderSummaryValue = (value) => {
     if (Array.isArray(value)) {
         if (value.length === 0) return <span className="text-muted">Not listed</span>;
         return (
-            <div className="d-flex flex-wrap gap-2">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center" }}>
                 {value.map((item, i) => (
-                    <span key={i} className="badge rounded-pill bg-light text-dark border px-3 py-2">
+                    <span
+                        key={i}
+                        style={{
+                            display: "inline-block",
+                            padding: "5px 12px",
+                            borderRadius: "999px",
+                            border: "1px solid #dbe0ea",
+                            background: "#f4f6fb",
+                            color: "#2b3445",
+                            fontSize: "0.86rem",
+                            lineHeight: 1.35,
+                            whiteSpace: "nowrap",
+                        }}
+                    >
                         {typeof item === "string" ? item : JSON.stringify(item)}
                     </span>
                 ))}
             </div>
         );
     }
-    if (value && typeof value === "object") return <pre className="mb-0 small">{JSON.stringify(value, null, 2)}</pre>;
-    if (value === null || value === undefined || value === "") return <span className="text-muted">Not available</span>;
+    if (value && typeof value === "object") {
+        return <pre className="mb-0 small">{JSON.stringify(value, null, 2)}</pre>;
+    }
+    if (value === null || value === undefined || value === "") {
+        return <span className="text-muted">Not available</span>;
+    }
     return value;
 };
 

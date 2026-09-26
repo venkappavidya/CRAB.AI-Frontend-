@@ -8,6 +8,18 @@ import axios from "axios";
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Tooltip, ResponsiveContainer } from "recharts";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+// Papers arrive either as a bare filename uploaded by a student, which lives
+// under public/uploads, or as an absolute URL for papers sourced elsewhere.
+// Prefixing an absolute URL with /uploads/ produces a path that does not
+// exist, and the SPA fallback then serves the home page instead of the PDF.
+const resolvePaperUrl = (pdfUrl) => {
+    if (!pdfUrl) return "#";
+    if (/^https?:\/\//i.test(pdfUrl)) return pdfUrl;
+    const name = pdfUrl.replace(/^\/?uploads\//, "");
+    return `${process.env.PUBLIC_URL}/uploads/${name}`;
+};
+
+
 export default function ReviewerDashboard() {
     const [papers, setPapers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -729,7 +741,7 @@ export default function ReviewerDashboard() {
                                                         <p>
                                                             <strong>PDF:</strong>{" "}
                                                             <motion.a
-                                                                href={`${process.env.PUBLIC_URL}/uploads/${selectedPaper.pdfUrl}`}
+                                                                href={resolvePaperUrl(selectedPaper.pdfUrl)}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="secondary-button btn-sm"

@@ -12,6 +12,36 @@ import "bootstrap/dist/css/bootstrap.min.css";
 // under public/uploads, or as an absolute URL for papers sourced elsewhere.
 // Prefixing an absolute URL with /uploads/ produces a path that does not
 // exist, and the SPA fallback then serves the home page instead of the PDF.
+// Title-case the field name, and pluralise "author" when there are several.
+const formatSummaryLabel = (key, value) => {
+    const label = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ");
+    if (key.toLowerCase() === "author" && Array.isArray(value) && value.length !== 1) {
+        return "Authors";
+    }
+    return label;
+};
+
+// A summary field is usually a string, but "author" is an array of names.
+// React concatenates array children with no separator, which renders
+// ["Ada Lovelace","Alan Turing"] as "Ada LovelaceAlan Turing".
+const renderSummaryValue = (value) => {
+    if (Array.isArray(value)) {
+        if (value.length === 0) return <span className="text-muted">Not listed</span>;
+        return (
+            <div className="d-flex flex-wrap gap-2">
+                {value.map((item, i) => (
+                    <span key={i} className="badge rounded-pill bg-light text-dark border px-3 py-2">
+                        {typeof item === "string" ? item : JSON.stringify(item)}
+                    </span>
+                ))}
+            </div>
+        );
+    }
+    if (value && typeof value === "object") return <pre className="mb-0 small">{JSON.stringify(value, null, 2)}</pre>;
+    if (value === null || value === undefined || value === "") return <span className="text-muted">Not available</span>;
+    return value;
+};
+
 const resolvePaperUrl = (pdfUrl) => {
     if (!pdfUrl) return "#";
     if (/^https?:\/\//i.test(pdfUrl)) return pdfUrl;
@@ -781,7 +811,7 @@ export default function ReviewerDashboard() {
                                                                         onClick={() => setOpenSummary(key)}
 
                                                                     >
-                                                                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                                                                        {formatSummaryLabel(key, value)}
                                                                     </button>
                                                                 </h2>
                                                                 {/* <div
@@ -790,7 +820,7 @@ export default function ReviewerDashboard() {
                                                                 data-bs-parent="#summaryAccordion"
                                                             > */}
                                                                 {openSummary == key && <div className="accordion-body">
-                                                                    {value}
+                                                                    {renderSummaryValue(value)}
                                                                 </div>}
                                                                 {/* </div> */}
                                                             </div>
@@ -1060,7 +1090,7 @@ export default function ReviewerDashboard() {
                                                                         onClick={() => setOpenSummary(key)}
 
                                                                     >
-                                                                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                                                                        {formatSummaryLabel(key, value)}
                                                                     </button>
                                                                 </h2>
                                                                 {/* <div
@@ -1069,7 +1099,7 @@ export default function ReviewerDashboard() {
                                                                 data-bs-parent="#summaryAccordion"
                                                             > */}
                                                                 {openSummary == key && <div className="accordion-body">
-                                                                    {value}
+                                                                    {renderSummaryValue(value)}
                                                                 </div>}
                                                                 {/* </div> */}
                                                             </div>
